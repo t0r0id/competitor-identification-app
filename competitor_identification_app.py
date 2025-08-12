@@ -195,7 +195,7 @@ def get_similarity_scores(
         # Normalize scores if we have multiple targets
         if len(target_indices) > 1:
             target_bm25_norm = normalize_scores(target_bm25)
-            target_semantic_norm = normalize_scores(target_semantic)
+            target_semantic_norm = target_semantic
         else:
             # Single target - use min-max normalization
             target_bm25_norm = target_bm25 / (np.max(target_bm25) + 1e-10)
