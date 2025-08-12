@@ -11,6 +11,7 @@ from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+from scipy.stats import norm
 
 # Page configuration
 st.set_page_config(
@@ -117,7 +118,7 @@ def compute_semantic_similarity(query_embedding: np.ndarray, doc_embeddings: np.
     return similarities
 
 
-def normalize_scores(scores: np.ndarray) -> np.ndarray:
+def normalize_scores_min_max(scores: np.ndarray) -> np.ndarray:
     """Normalize scores using standard normal distribution (z-score normalization)."""
     if len(scores) == 0:
         return scores
@@ -138,10 +139,26 @@ def normalize_scores(scores: np.ndarray) -> np.ndarray:
 
     min, max = scores.min(), scores.max()
     normalized = (scores-min)/(max-min)
-    
-   
 
+    return normalized
+
+def normalize_scores_zdist(scores: np.ndarray) -> np.ndarray:
+    if len(scores) == 0:
+        return scores
     
+    # Calculate mean and standard deviation
+    mu = np.mean(scores)
+    sigma = np.std(scores, ddof=1)  # Use sample standard deviation
+    
+    if sigma == 0:
+        # All scores are the same
+        return np.zeros_like(scores)
+    
+    # Z-score normalization
+    z_scores = (scores - mu) / sigma
+     # Convert z-scores to [0, 1] range using sigmoid function
+    # This maps z-scores to a 0-1 range while preserving relative distances
+    normalized = norm.cdf(z_scores)
     return normalized
 
 
@@ -194,8 +211,8 @@ def get_similarity_scores(
         
         # Normalize scores if we have multiple targets
         if len(target_indices) > 1:
-            target_bm25_norm = normalize_scores(target_bm25)
-            target_semantic_norm = target_semantic
+            target_bm25_norm = normalize_scores_min_max(target_bm25, )
+            target_semantic_norm = normalize_scores_zdist(target_semantic)
         else:
             # Single target - use min-max normalization
             target_bm25_norm = target_bm25 / (np.max(target_bm25) + 1e-10)
