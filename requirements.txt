@@ -1,0 +1,11 @@
+# Core dependencies for competitor identification app
+streamlit>=1.28.0
+numpy>=1.24.0
+pandas>=2.0.0
+plotly>=5.17.0
+rank-bm25==0.2.2
+
+# Note: The app also requires pre-computed indices:
+# - business_units_with_embeddings.pkl or .json
+# - bm25_index.pkl
+# These should be generated using the index_business_units.py script
