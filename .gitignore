@@ -17,7 +17,6 @@ build/
 *.log
 
 # Data files (too large for git, should be generated locally)
-*.pkl
 business_units_with_embeddings.json
 *.csv
 
